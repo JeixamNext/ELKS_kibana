@@ -1,0 +1,12 @@
+logstash: Servicio que recoge informacion de distintas fuentes simultaneamente, la procesa y las reenvia a salidas
+- inpunts; de donde entran los datos, por ejemplo beats,http,redis,twitter,ect
+- filter: procesa la informacion de los inputs 
+- output: a donde se llevan 
+
+Se encuentra entre beats y elasticsearch 
+
+- puede cifrar las comunicaciones
+- muchos plugins
+- colas de almacenamiento
+
+

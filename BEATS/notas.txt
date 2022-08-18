@@ -1,0 +1,23 @@
+BEATS: agentes que realizan envio de informacion
+
+- Los destinos principales suelen ser Elasticsearch o Logstash
+
+esta compuesto principalente por:
+
+- filebeat: reenvio centrado en logs y ficheros (se instala en lo que se quiere monitorizar
+- metricbeat: metricas y recursos
+	-- configurar setup kibana en metricbeat.yaml (host:192.168.X.X:5601)
+	-- ./bin/metricbeat setup --dashboards -c /ect/metricbeat/metricbeat.yaml (configurar los dashboard )(tener la carpeta kibana en bin de metricbeat)
+- packetbeat: sniffer de paquetes de red, analisis de paquetes de red
+	-- cd /usr/share/packetbeat
+	-- mv kibana bin
+	-- ./bin/packetbeat setup --dashboards -c /etc/packetbeat/packetbeat.yml
+
+- winlogbeat: recoleccion de event logs de windows
+- audirbeat: eventos de segiridad linux e integridad de archivos
+- heartbeat: monitoriza los servicios que estan levantados 
+	-- ./bin/heartbeat setup --dashboards -c /etc/heartbeat/heartbeat.yml
+- libbeat: beats de la comunidad con caracteristicas que no tienen los basicos 
+- https://www.elastic.co/guide/en/beats/libbeat/current/community-beats.html
+
+

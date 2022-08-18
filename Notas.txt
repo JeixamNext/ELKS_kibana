@@ -1,0 +1,268 @@
+visivilidad:
+
+- App y servicios
+- Arquitectura de red
+- Redes sociales
+- Monitorizacion
+
+arquitectura:
+
+- data soures
+- logstash: o exportadores
+- Elasticsearch: o base de datos no relacional donde almacenar los logs
+- Kibana: monitorizacion, representar los datos en paneles  
+
+¿Que es un nodo?: instancia o equipo donde se levanta un servicio de ElascticSearch
+
+Puede conectarse a mas nodos en un Cluster
+
+- Master node: nodo maestro que controla al resto, crea/ borra indices
+- Data Node: almacena los datos, KRUD(crear,leer,actualizar,eliminar), buscar y agregaciones
+
+Documento: cada entrada o evento que se quiera almacenar en elasticsearch  
+- formato JSON
+- metadatos: _index,_type,_id
+
+index: coleccion de documentos con caracteristica similares (clientes,pedidos,facturas,productos)
+type:relaciones de un indice, mapping (que datos componen un tipo de evento)(string,interger,date)
+
+BIG data: problematica
+- limite de hadware
+- sobrecarga de un unico sistema
+- caida del sistema 
+
+Shards: subdivision de del indice para repartir en diferentes nodos y evitar la sobrecarga de informacion a una unica instancia
+Replicas: copia de un shards para lograr alta disponibilidad y tolerancia a fallos. se encontraran en diferentes nodos por cada shards(tener copias de todo en cada nodo por si se cae uno o varios)
+
+##############################################################################################################################################################################################################################################
+¿Que podemos configurar en elasticsearch?
+
+- el numero de shard de nuestro indice
+- el numero de replicas que puede tener 1 shard
+- el numero total de shard que puede tener 1 nodo
+- a que nodos deben ir los shard (dividiendo el cluster en zonas). Por ejemplo, los shard del Indice A van a la Zona UNO y los shards del indice B van a la Zona DOS
+- a que nodos NO deben ir los shard (dividiendo el cluster en zonas)
+
+Las zonas se asignan en la configuración del nodo. Cuando arrancamos un nodo en su fichero de configuración podemos indicarle a que zona pertenece.
+
+elasticsearch.yml
+
+###############################################################################################################################################################################################################################################
+
+Bases de datos distrubuidas:
+- la informacion se almacena en distintos puntos de la red (nodos)
+- trasparente
+- independiente respecto del SO
+- consultas distribuidas
+- gran numero de replicas
+
+Instalacion ElasticSearch y kibana:
+
+- pdf instalacion+en+linux
+- instalar java 
+- ps -p 1
+
+##########################################################################################################################
+Si sale error de Timeout en elasticsearch:
+
+- sudo nano usr/lib/systemd/system/elasticsearch.service
+
+- TimeoutStartSec=500
+
+- systemctl daemon-reload
+
+###########################################################################################################################
+
+- sudo Yum install kibana
+- systemctl daemon-reload
+- systemctl enable kibana.service 
+- systemctl start kibana.service
+- puerto 5601
+- ps aux|grep elasticsearch
+- ps aux|grep kibana
+
+
+configuracion inicial:
+
+- pdf instalacion basica
+- usr/share/elasticsearch/ (home de elastic)
+- ect/elasticsearch (elasticsearch.yaml,jvm.options)(configuracion)
+- var/log/elasticsearch (logs)
+- var/lib/elasticsearch (base de datos)
+- usr/share/kibana (home de kibana)
+- ect/kibana (kibana.yaml)(configuracion)
+-- free (ver memoria ram)
+-- (bloquear memoria para el uso exclusivo de elastic)
+--- nano jvm.options: botstrap.memory_lock:true (elasticsearch.yaml)
+--- nano etc/default/elasticsearch: Max_locked_memory=unlimit
+--- nano usr/lib/systemd/system/elasticsearch.service: LimitMEMLOCK=infinity
+
+momoria swap: usar el dico duro como memoria ram 
+
+- es mejor no usar memoria swap: nano etc/fstab: comentar el swap 
+
+configurar:
+
+- ect/elasticsearch/elasticsearch.yaml
+-- cluster.name
+-- name.node: $(HOSTNAME)
+-- systemcetl restart elasticsearch
+
+
+info: pdf APIrest
+
+- API: interfaz de programacion de applicaciones 
+
+- https://www.elastic.co/guide/en/elasticsearch/reference/current/rest-apis.html
+
+Cluster API: informacion del cluster 
+
+- GET_Cluster/health?pretty (verde,amarillo,rojo)
+-- curl -XGET http://localhost:9200/_cluster/healt
+-- curl -XGET http://localhost:9200/_cluster/healt?pretty
+- GET_Cluster/stats?pretty: estadisticas en formato humano
+-- curl -XGET http://localhost:9200/_cluster/stats?pretty
+-- curl -XGET http://localhost:9200/_cluster/stats?human
+- GET_nodes/stats?pretty: info del nodo
+-- curl -XGET http://localhost:9200/_nodes?pretty
+
+Cat API : muestra resultados en forma estructurada en tablas 
+
+- GET_cat/health?v
+-- curl -XGET http://localhost:9200/_cat/health?v
+-- curl -XGET http://localhost:9200/_cat/master?v
+-- curl -XGET http://localhost:9200/_cat/indices?v (verde,rojo,amarillo)
+-- curl -XGET http://localhost:9200/_cat/shards?v  
+
+info: kibana o Grafana usan la api de Search principalmente
+
+Documents API:
+
+crear: crea una especie de twitter con el indice twitter y el tipo tweet
+
+- index api: añade documentos json en un indice especifico
+- curl -XPUT 'localhost:9200/twitter/tweet/1?pretty -H 'Content-Type:application/json' -d' 
+{
+   "user":"jex",
+   "post_date":"2022-07-9T12:03:12",
+   "message":"prueba 1"
+}'
+
+- curl -XGET http://localhost:9200/_cat/indices?v
+- curl -XGET http://localhost:9200/twitter/tweet/1?pretty
+
+borrar:
+
+- curl -XDELETE 'localhost:9200/twitter/tweet/7?pretty
+
+update:
+
+- XPOST 'localhost:9200/twitter/tweet/6/_update?pretty' -H 'Content-Type:application/json' -d'
+{
+   "script":"ctx._source.likes=\"enable\""
+}'
+
+
+Search api: consulta 
+
+URI search:
+
+- curl -XGET 'http://localhost:9200/twitter/_search?q=user:udemy&pretty'
+- curl -XGET 'http://localhost:9200/twitter/_search?q=like:enable&pretty'
+
+request body search: consulta DSL en formato json
+
+- curl -XGET 'http://localhost:9200/twitter/_search?pretty' -H 'Content-Type:application/json' -d'
+{
+  "query":{"term":{"user":"user1"}}
+},
+
+search template: plantillas de busquedas {{my_field}} {{my_value}} hacen referencia a muchos de forma que solo hay que cambiar esos parametros para realizar busquedas muy grandes
+
+curl -XGET '192.168.1.31:9200/_search/template?pretty' -H 'Content-Type: applicati
+on/json' -d' 
+
+{
+ "inline" : 
+ {
+  "query": { "match" : { "{{my_field}}" : "{{my_value}}" } },
+  "size" : "{{my_size}}"
+ },
+ "params" : 
+ {
+ "my_field" : "user",
+ "my_value" : "udemy",
+ "my_size" : 2
+  }
+ }'
+
+Search Shards: Devuelve los shards sobre los que se ejecutará una búsqueda. Util para la busqueda de errores, si realiza la busqueda en todos los shards es que estan bien (por defecto genera 5 shards)
+
+- curl -XGET '192.168.1.31:9200/twitter/_search_shards?pretty'
+
+##########################################################################################################################################################################################################################
+¿Que ocurre cuando arrancamos un nuevo nodo de elasticsearch?
+
+El nuevo nodo forma parte del cluster ya existente
+Los 5 shards primarios del nodo 1 son distribuidos entre el nodo 1 y el nodo 2
+Esto es util cuando esperamos una gran carga. Si no, con 1 unico shard primario seria suficiente.
+
+###########################################################################################################################################################################################################################
+
+indices Api: Permite la creación de un nuevo índice en el que se le pueden pasar parámetros como el número de
+shards y réplicas que lo compondrán.
+
+- curl -XPUT 'localhost:9200/dterminal?pretty' -H 'Content-Type: application/json' -d'
+ 
+{
+ "settings" : {
+  "index" : {
+  "number_of_shards" : 3,
+  "number_of_replicas" : 2
+  }
+ }
+}'
+
+####################
+curl -XGET 'localhost:9200/_cat(indices?v
+######################
+
+delete:
+
+curl -XDELETE 'localhost:9200/dterminal?pretty'
+
+####################################################################
+para evitar eliminar todo si se usa _all o *
+
+vi /etc/elasticsearch/elasticsearch.yml
+descomentando el parámetro action.destructive_requires_name:true .
+#####################################################################
+
+
+Mediante la interfaz grafica: mas sencillo sin tener que poner la url o usar curl (necesita acceso a kibana)
+
+- devtools
+- GET _cat(indices?v
+- GET /twitter/tweet/1
+- Get _search
+{
+  "query":{"term":{"user":"user1"}}
+},
+#################################################################################################
+- GET _search/template
+{
+ "inline" : 
+ {
+  "query": { "match" : { "{{my_field}}" : "{{my_value}}" } },
+  "size" : "{{my_size}}"
+ },
+ "params" : 
+ {
+ "my_field" : "user",
+ "my_value" : "udemy",
+ "my_size" : 2
+  }
+ }'
+
+
+
