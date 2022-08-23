@@ -1,4 +1,5 @@
 logstash: Servicio que recoge informacion de distintas fuentes simultaneamente, la procesa y las reenvia a salidas
+Basicamente es el exportador de metricas.
 - inpunts; de donde entran los datos, por ejemplo beats,http,redis,twitter,ect
 - filter: procesa la informacion de los inputs 
 - output: a donde se llevan 
@@ -9,4 +10,41 @@ Se encuentra entre beats y elasticsearch
 - muchos plugins
 - colas de almacenamiento
 
+ejecucion manual:
+
+- usr/share/logstash/
+- bin/logstash -e ' input {stdin {} } output {stdout {} }'
+
+con fichero: 
+
+-conf.d/logstash.conf
+
+input {
+ file {
+ path => "/home/elastic/Documents/datos.json"
+ start_position => "beginning"
+ codec => "json"
+ }
+}
+output {
+ stdout { codec => rubydebug }
+}
+
+- ejecutarlo: /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/logstash.conf --path.sett
+ings=/etc/logstash
+
+
+apache.conf
+-  /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/apache.conf --path.sett
+ings=/etc/logstash
+
+mapping:
+
+- cada documento se almacena con un indice y un mapping
+- twitter(indice)user(type)tweet(type)
+- cada documento contiene su mapping como un metadato 
+- cada mapping contiene sus propios campos 
+- para las bases de datos no relacionales un campo no es independiente de cada type, lo que puede traer algunas confusiones
+- con el tiempo elactic trata de ir eliminando los type para evitar este problema
+- crear un template
 

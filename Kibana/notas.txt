@@ -1,0 +1,24 @@
+- visualiza los datos indexados en elasticsearch
+- APM: monitoriza el rendimiento de app recolectando estadisticas
+- maching lerning (x-pack): aprendizaje automatico 
+- graph: analiza relaciones entre documentos
+- dev tools: interactua con REST API para realizar consultas, contiene debugger de grok
+- monitorizacion
+- management: gestiona y administra kibana: visualizaciones,dashbord,indices,ect
+- canvas: genera reportes
+
+Discover: ver eventos, en fecha y rango de tiempo
+
+- en la barra de busqueda puede contener logica: _type * and _like * and >= 2022-08-01
+- crear filtos
+
+Visualizaciones y dashboard:
+
+- crear paneles dashboard y visualizaciones con querys especificando sus axis y filtros
+- time series: crear una linea de tiempo visible mediante una query
+
+
+	
+
+ 
+
