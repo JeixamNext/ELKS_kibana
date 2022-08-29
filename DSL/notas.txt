@@ -1,0 +1,69 @@
+DSL: domain specific lenguaje
+
+- la consulta a elasticSearch
+- usa formato JSON
+- consultas simples y compuestas
+
+El comportamiento varia segun el contexto
+
+-query: como _score
+-filtrer: si cumple una condicion
+
+
+Full text query: 
+
+- https://www.elastic.co/guide/en/elasticsearch/reference/current/full-text-queries.html
+
+ejemplos:
+
+- match query: devuelve el resultado que mas se adapte a la busqueda (suele dar todos los que contengan una parte del mensaje)
+
+GET /_search
+{
+  "query": {
+    "match": {
+      "message": {
+        "query": "this is a test"
+      }
+    }
+  }
+}
+
+# si se le añade operator: "and" buscara si tiene todo el mensaje exacto
+
+
+- Phrase query: analiza el conjunto de la frase  
+
+GET /_search
+{
+  "query": {
+    "match_phrase": {
+      "message": "this is a test"
+    }
+  }
+}
+
+multi match: buscar un valor en mas de un campo
+
+GET /_search
+{
+  "query": {
+    "multi_match" : {
+      "query":    "this is a test", 
+      "fields": [ "subject", "message" ] 
+    }
+  }
+}`
+
+query sting query: variar el campo por el que busca
+
+GET /_search
+{
+  "query": {
+    "query_string": {
+      "query": "(new york city) OR (big apple)",
+      "default_field": "content"
+    }
+  }
+}
+

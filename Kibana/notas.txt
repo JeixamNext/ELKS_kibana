@@ -18,7 +18,18 @@ Visualizaciones y dashboard:
 - time series: crear una linea de tiempo visible mediante una query
 
 
-	
+APM: 
 
- 
+APM: monitorizacion del rendimeinto de la applicacion
+
+- https://www.elastic.co/guide/en/apm/guide/current/index.html
+
+- encontrar y corregir bloques,y cuellos de bottela en el codigo 
+- buscar un codigo mas eficiente.
+- proporciona dasboard ya preconfigurados
+- integracion con machine learning 
+- integracion con alerting 
+
+
+
 
