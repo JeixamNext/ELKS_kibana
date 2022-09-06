@@ -1,0 +1,78 @@
+Contruir un cluster: alta disponibilidad 
+
+- maquina 192.168.1.31 elactic search
+- maquina 192.168.1.32 elactic 02: instalar elastic search/java 8
+- maquina 192.168.1.33 elactic 03: instala elastic search/java 8 
+
+configurar elasticsearch.yaml (en elastic 01/02/03)
+
+- discovery.zen.ping.unicast.hosts: ["192.168.1.31", "192.168.1.32", "192.168.1.33"]
+- discovery.zen.minimum_master_nodes: 2
+
+solo en elastic 02/03:
+
+- cluster name
+- node name: ${HOSTNAME}
+- bootstrap.memory_lock
+- network.host: 192.168.1.32/192.168.1.33
+
+#############################################################################################################################################################################################################
+
+- split brain: dentro de un cluster la aparicion de mas de un master ente la perdida de conectividad (el esclavo se convierte en master si pierde a conectividad durante un cierto tiempo) 
+
+###################################################################################################
+nodo:index(x):shards(xx)
+cluster:nodos:mastro,slave
+minimum_master_nodes: para que un cluster no quede inconsistente si ocurre un split brain
+###################################################################################################
+
+- reiniciar elasticSearch en los tres 
+
+
+Nodos coordinadores: 
+
+- realiza funciones de baanceado quitando carga al master
+- decide la ubicacion de los shards
+- evita que el master se sobrecarga 
+- realia la fase Reduce en las consultas
+
+crear nodo coordinador: en la  maquina que se desee: 192.168.1.30  
+
+- /ect/elasticsearch.yml
+
+node.name:{HOSTNAME}
+node.master: false
+node.data: false
+node.ingest: false
+search.remote.conect: false
+
+#discovery:
+- discovery.zen.ping.unicast.hosts: ["192.168.1.31", "192.168.1.32", "192.168.1.33"]
+
+
+#############################################################################
+nodo master:
+-- crea y elimina indices
+-- nodos que forman el cluster
+-- estado del cluster
+-- decide la ubicacion de los shards
+-- dirigir las busquedas a los correspondientes dataNodes
+################################################################################
+
+Escalado de Logstash: ofrece
+
+- balanceo de carga 
+- alta disponibilidad 
+
+#####################################################################################
+
+Kafka: 
+
+- sistema de cola de mensajes publicador/suscriptor
+- proyecto de apache de codigo abierto
+- escalable y de baja latencia para procesas datos a tiempo real
+- puede servir como cahe temporal de eventos
+
+######################################################################################
+
+instalacion en el pdf escalado de logtash
